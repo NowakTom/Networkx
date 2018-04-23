@@ -1,19 +1,49 @@
 import csv
 import networkx as nx
 import matplotlib.pyplot as plt
-g=nx.Graph()
+G=nx.Graph()
+
 from urllib.request import urlretrieve
-website = "https://raw.githubusercontent.com/NowakTom/Networkx/master/out_ucidata-gama.txt"
-urlretrieve(website, "out_ucidata-gama.txt")
+website = "https://raw.githubusercontent.com/NowakTom/Networkx/master/out_ucidata-gama1.csv"
+urlretrieve(website, "out_ucidata-gama1.csv")
+f1 = csv.reader(open('out_ucidata-gama1.csv','r'))
 
-f1 = csv.reader(open("out_ucidata-gama.txt","r"))
-for row in f1: G.add_nodes_from(row[0], color = 'blue')
+website = "https://raw.githubusercontent.com/NowakTom/Networkx/master/out_ucidata-gama2.csv"
+urlretrieve(website, "out_ucidata-gama2.csv")
+f2 = csv.reader(open('out_ucidata-gama2.csv','r'))
 
-for row in f1: G.add_nodes_from(row[1], color = 'red')
+website = "https://raw.githubusercontent.com/NowakTom/Networkx/master/out_ucidata-gama_relation.csv"
+urlretrieve(website, "out_ucidata-gama_relation.csv")
+f3 = csv.reader(open('out_ucidata-gama_relation.csv','r'))
 
-for row in f1: G.add_edge(row[0],row[1])
+website = "https://raw.githubusercontent.com/NowakTom/Networkx/master/out_ucidata-gama.csv"
+urlretrieve(website, "out_ucidata-gama.csv")	
 
+for row in f1: 
+    G.add_nodes_from(row, color = 'red')
+
+for row in f2: 
+    G.add_nodes_from(row, color = 'red')
+
+for row in f3:
+    if len(row) == 2 : 
+        G.add_edge(row[0],row[1])
+
+	
 color_map = []
 
-for n in G.nodes(): color_map.append(G.node[n]['color']) nx.draw_networkx(G, node_color = color_map, with_labels = True, node_size = 500)
+for n in G.nodes():
+    color_map.append(G.node[n]['color'])
 
+G = nx.read_weighted_edgelist("out_ucidata-gama.csv", delimiter=",") 
+	
+pos=nx.spring_layout(G), dim = 2)
+	
+nx.draw_networkx(G, pos, node_color = color_map, with_labels = True, node_size = 500)
+
+edge_labels=dict([((u,v,),d['weight'])
+             for u,v,d in G.edges(data=True)])
+			 
+nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
+
+plt.show()

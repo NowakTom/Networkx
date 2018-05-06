@@ -23,7 +23,7 @@ for row in f1:
     G.add_nodes_from(row, color = 'red')
 
 for row in f2: 
-    G.add_nodes_from(row, color = 'red')
+    G.add_nodes_from(row, color = 'green')
 
 for row in f3:
     if len(row) == 2 : 
@@ -38,13 +38,15 @@ for n in G.nodes():
 
 G = nx.read_weighted_edgelist("out_ucidata-gama.csv", delimiter=",") 
 	
-pos=nx.spring_layout(G, dim = 2)
+#pos=nx.spring_layout(G, dim = 2)
 	
-nx.draw_networkx(G, pos, node_color = color_map, with_labels = True, node_size = 500)
+#nx.draw_networkx(G, pos, node_color = color_map, with_labels = True, node_size = 500)
 
-edge_labels=dict([((u,v,),d['weight'])
-             for u,v,d in G.edges(data=True)])
+#edge_labels=dict([((u,v,),d['weight'])
+#             for u,v,d in G.edges(data=True)])
 			 
 #nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
+
+nx.draw_circular(G, node_color = color_map, with_labels=True)
 
 plt.show()

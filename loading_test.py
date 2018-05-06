@@ -35,15 +35,16 @@ color_map = []
 for n in G.nodes():
     color_map.append(G.node[n]['color'])
 
+
 G = nx.read_weighted_edgelist("out_ucidata-gama.csv", delimiter=",") 
 	
-pos=nx.spring_layout(G), dim = 2)
+pos=nx.spring_layout(G, dim = 2)
 	
 nx.draw_networkx(G, pos, node_color = color_map, with_labels = True, node_size = 500)
 
 edge_labels=dict([((u,v,),d['weight'])
              for u,v,d in G.edges(data=True)])
 			 
-nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
+#nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
 
 plt.show()

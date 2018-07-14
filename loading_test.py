@@ -49,4 +49,20 @@ G = nx.read_weighted_edgelist("out_ucidata-gama.csv", delimiter=",")
 
 nx.draw_circular(G, node_color = color_map, with_labels=True)
 
+import numpy as np
+
+def entropy(X):
+     # policz ile razy każda wartość występuje na liście
+     # i zamień tę liczbę na prawdopodobieństwo
+     _dict = { x: X.count(x)/len(X) for x in X }
+
+     # wylicz entropię zmiennej losowej
+     _entropy = -1 * np.sum([p * np.log2(p) for p in _dict.values()])
+
+     return _entropy
+
+lst = [1,2,1,2,1,2,1,2]
+
+print(entropy(lst))
+
 plt.show()

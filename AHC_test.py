@@ -11,7 +11,8 @@ def entropy(X):
      return _entropy
 
 G=nx.Graph()
-color_list = []
+summary_list = []
+
 
 G = nx.random_graphs.erdos_renyi_graph(31,0.3)
 
@@ -27,6 +28,14 @@ for u,v in G.edges:
 
 group = [[i] for i in G]
 
+#while (len(group) >  1):
+#	for i in group:
+#		for u,v in G.edges:	
+#			if  G.nodes[u]['color'] !=  G.nodes[v]['color']:
+				
+
+
+
 
 #for node in G:	
 #	print(G.nodes[node]['color'])
@@ -34,17 +43,26 @@ group = [[i] for i in G]
 print(group)
 #print(entropy(G.nodes[i]['color']))
 
-for i in G.nodes:	
-	color_list.append(G.nodes[i]['color'])
+#for i in G.nodes:	
+#	color_list.append(G.nodes[i]['color'])
 
 #1/x * entropy(dict_colors
 
 
+#print(entropy(list(node_colors.values())))
+#print(len(group))
+#print(sum(G.degree(weight = 'weight')))
 #Z = linkage(X, 'single')
-print(color_list)
-print(entropy(color_list))
+#print(color_list)
+#print(entropy(color_list))
 #print(G.degree(weight = 'weight')[0])
 #print(len(G.degree))
 #print(len(color_list))
 
 #print(G.degree(weight = 'weight')[0])
+
+X = [[i] for i in [2, 8, 0, 4, 1, 9, 9, 0]]
+Z = linkage(X, 'single')
+print(X)
+print(Z)
+print(type(Z))

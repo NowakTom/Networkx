@@ -10,8 +10,18 @@ def entropy(X):
 
      return _entropy
 
+	 
+def nodes_connected(u, v):
+	return u in G1.neighbors(v)
+
+def remove_values_from_list(the_list, val):
+   return [value for value in the_list if value != val]
+
 G=nx.Graph()
 summary_list = []
+lista_u =[]
+lista_v = []
+
 
 
 G = nx.random_graphs.erdos_renyi_graph(31,0.3)
@@ -28,6 +38,31 @@ for u,v in G.edges:
 
 group = [[i] for i in G]
 
+G1 = nx.Graph(G)
+
+for node1 in G1.nodes:
+	najmniejsza = 100
+	najblizszy_wezel_2 = 99
+	for node2 in G1.nodes:
+		waga = float()
+		entropia = float()
+		odleglosc =  float()
+		if nodes_connected(node1, node2) is True:
+			waga = G1.degree(node1) + G1.degree(node2)
+			entropia = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
+		if waga > 0:
+			odleglosc = 1/waga * entropia
+		if odleglosc > 0 and odleglosc < najmniejsza:
+			najmniejsza = odleglosc
+			najblizszy_wezel_2 = node2
+	print(najmniejsza)
+	print(node1)
+	print(najblizszy_wezel_2)
+#		summary_list.append(odleglosc)
+		
+
+
+#		summary_list.append(G1.degree(node))
 #while (len(group) >  1):
 #	for i in group:
 #		for u,v in G.edges:	
@@ -35,12 +70,18 @@ group = [[i] for i in G]
 				
 
 
+#summary_list = remove_values_from_list(summary_list, 0)
+#print(min(summary_list))
 
+
+#print(list(G.neighbors(0)))
 
 #for node in G:	
 #	print(G.nodes[node]['color'])
 
-print(group)
+
+
+#print(G.nodes[30]['color'])
 #print(entropy(G.nodes[i]['color']))
 
 #for i in G.nodes:	
@@ -61,8 +102,10 @@ print(group)
 
 #print(G.degree(weight = 'weight')[0])
 
-X = [[i] for i in [2, 8, 0, 4, 1, 9, 9, 0]]
-Z = linkage(X, 'single')
-print(X)
-print(Z)
-print(type(Z))
+#X = [[i] for i in [2, 8, 0, 4, 1, 9, 9, 0]]
+#Z = linkage(X, 'single')
+#print(X)
+#print(Z)
+#print(type(Z))
+#dn = dendrogram(Z)
+#plt.show()

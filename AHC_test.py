@@ -12,15 +12,15 @@ def entropy(X):
 
 	 
 def nodes_connected(u, v):
-	return u in G1.neighbors(v)
+	return u in G.neighbors(v)
 
 def remove_values_from_list(the_list, val):
    return [value for value in the_list if value != val]
 
 G=nx.Graph()
 summary_list = []
-lista_u =[]
-lista_v = []
+minimum_list =[]
+closest_group_list = []
 
 
 
@@ -40,26 +40,54 @@ group = [[i] for i in G]
 
 G1 = nx.Graph(G)
 
-for node1 in G1.nodes:
-	najmniejsza = 100
-	najblizszy_wezel_2 = 99
-	for node2 in G1.nodes:
-		waga = float()
-		entropia = float()
-		odleglosc =  float()
-		if nodes_connected(node1, node2) is True:
-			waga = G1.degree(node1) + G1.degree(node2)
-			entropia = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
-		if waga > 0:
-			odleglosc = 1/waga * entropia
-		if odleglosc > 0 and odleglosc < najmniejsza:
-			najmniejsza = odleglosc
-			najblizszy_wezel_2 = node2
-	print(najmniejsza)
-	print(node1)
-	print(najblizszy_wezel_2)
-#		summary_list.append(odleglosc)
-		
+lista = [0, 5, 5]
+
+x = 0
+y = 1
+#for i in group:
+#	for j in group:
+#		for x in i:
+#			for y in j:
+#				print(nodes_connected(x, y))
+
+while len(group) > 1:
+	minimum_list = []
+	closest_group_list = []
+	do_usuniecia = int()
+	for i in group[:]:
+		minimum = 100
+		closest_group = 100
+		for j in group:
+				for x in i:
+					for y in j:
+						waga = 0
+						entropia = 0
+						odleglosc =  0
+						if nodes_connected(x, y) is True:
+							waga = G.degree(x) + G.degree(y)
+							entropia = entropy(G.nodes[x]['color'] + G.nodes[y]['color'])
+							if waga > 0:
+								odleglosc = 1/waga * entropia
+							if odleglosc > 0 and odleglosc < minimum:
+								minimum = odleglosc
+								closest_group = y
+		minimum_list.append(minimum)
+		closest_group_list.append(closest_group)
+	do_usuniecia = closest_group_list[minimum_list.index(min(minimum_list))]
+	print(minimum_list)
+	print(min(minimum_list))
+	print(minimum_list.index(min(minimum_list)))
+	print(do_usuniecia)
+	print(type(do_usuniecia))
+	print(closest_group_list)
+	print('###group####')
+	print(group)
+	group.remove(do_usuniecia)
+	#do_usuniecia += 1
+
+print(group)
+#group.remove(5)
+print(group)
 
 
 #		summary_list.append(G1.degree(node))

@@ -16,6 +16,36 @@ def nodes_connected(u, v):
 
 def remove_values_from_list(the_list, val):
    return [value for value in the_list if value != val]
+   
+class Cluster:
+	def __init__(self):
+		pass
+	def __repr__(self):
+		return '(%s,%s)' % (self.left, self.right)
+	def add(self, clusters, grid, lefti, righti):
+		self.left = clusters[lefti]
+		self.right = clusters[righti]
+		for r in grid:
+			r[lefti] = min(r[lefti], r.pop(righti))
+		grid[lefti] = list(map(min, zip(grid[lefti], grid.pop(righti))))
+		clusters.pop(righti)
+		return (clusters, grid)
+
+def agglomerate(labels, grid):
+	clusters = labels
+	while len(clusters) > 1:
+		# find 2 closest clusters
+		print(clusters)
+		distances = [(1, 0, grid[1][0])]
+		for i,row in enumerate(grid[2:]):
+			distances += [(i+2, j, c) for j,c in enumerate(row[:i+2])]
+		j,i,_ = min(distances, key=lambda x:x[2])
+		c = Cluster()
+		clusters, grid = c.add(clusters, grid, i, j)
+		clusters[i] = c
+	return clusters.pop()
+   
+
 
 G=nx.Graph()
 summary_list = []
@@ -50,45 +80,44 @@ y = 1
 #			for y in j:
 #				print(nodes_connected(x, y))
 
-while len(group) > 1:
-	minimum_list = []
-	closest_group_list = []
-	do_usuniecia = int()
-	for i in group[:]:
-		minimum = 100
-		closest_group = 100
-		for j in group:
-				for x in i:
-					for y in j:
-						waga = 0
-						entropia = 0
-						odleglosc =  0
-						if nodes_connected(x, y) is True:
-							waga = G.degree(x) + G.degree(y)
-							entropia = entropy(G.nodes[x]['color'] + G.nodes[y]['color'])
-							if waga > 0:
-								odleglosc = 1/waga * entropia
-							if odleglosc > 0 and odleglosc < minimum:
-								minimum = odleglosc
-								closest_group = y
-		minimum_list.append(minimum)
-		closest_group_list.append(closest_group)
-	do_usuniecia = closest_group_list[minimum_list.index(min(minimum_list))]
-	print(minimum_list)
-	print(min(minimum_list))
-	print(minimum_list.index(min(minimum_list)))
-	print(do_usuniecia)
-	print(type(do_usuniecia))
-	print(closest_group_list)
-	print('###group####')
-	print(group)
-	group.remove(do_usuniecia)
+
+	#group[:] = [v for v in group if v.index != do_usuniecia]
+	
+	#group.remove(do_usuniecia)
 	#do_usuniecia += 1
+	
 
-print(group)
-#group.remove(5)
-print(group)
+	
+	
+	
+	
+wynik = []
 
+	
+for node1 in G.nodes:
+	waga = 0
+	entropia = 0
+	odleglosc =  0
+	odleglosc_list = []
+	for node2 in G.nodes:
+		waga = 0
+		entropia = 0
+		odleglosc =  0
+		if nodes_connected(node1, node2) is True:
+			waga = G.degree(node1) + G.degree(node2)
+			entropia = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
+			odleglosc = 1/waga * entropia
+		odleglosc_list.append(odleglosc)
+	
+	wynik.append(odleglosc_list)
+	
+
+#print(wynik)
+#print(G.nodes)
+nody = list(G.nodes)
+		
+
+print(agglomerate(nody, wynik))
 
 #		summary_list.append(G1.degree(node))
 #while (len(group) >  1):
@@ -106,7 +135,6 @@ print(group)
 
 #for node in G:	
 #	print(G.nodes[node]['color'])
-
 
 
 #print(G.nodes[30]['color'])

@@ -3,20 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram, linkage
 
-def entropy(X):
-     _dict = { x: X.count(x)/len(X) for x in X }
-
-     _entropy = -1 * np.sum([p * np.log2(p) for p in _dict.values()])
-
-     return _entropy
-
-	 
-def nodes_connected(u, v):
-	return u in G.neighbors(v)
-
-def remove_values_from_list(the_list, val):
-   return [value for value in the_list if value != val]
-   
 class Cluster:
 	def __init__(self):
 		pass
@@ -31,30 +17,23 @@ class Cluster:
 		clusters.pop(righti)
 		return (clusters, grid)
 
-def agglomerate(labels, grid):
-	clusters = labels
-	while len(clusters) > 1:
-		# find 2 closest clusters
-		print(clusters)
-		distances = [(1, 0, grid[1][0])]
-		for i,row in enumerate(grid[2:]):
-			distances += [(i+2, j, c) for j,c in enumerate(row[:i+2])]
-		j,i,_ = min(distances, key=lambda x:x[2])
-		c = Cluster()
-		clusters, grid = c.add(clusters, grid, i, j)
-		clusters[i] = c
-	return clusters.pop()
+def entropy(X):
+     _dict = { x: X.count(x)/len(X) for x in X }
+
+     _entropy = -1 * np.sum([p * np.log2(p) for p in _dict.values()])
+
+     return _entropy
+
+	 
+def nodes_connected(u, v):
+	return u in G.neighbors(v)
+
+def remove_values_from_list(the_list, val):
+   return [value for value in the_list if value != val]
    
-
-
 G=nx.Graph()
-summary_list = []
-minimum_list =[]
-closest_group_list = []
 
-
-
-G = nx.random_graphs.erdos_renyi_graph(31,0.3)
+G = nx.random_graphs.erdos_renyi_graph(32,0.3)
 
 node_colors = { i: np.random.choice(['white','black']) for i in G.nodes}
 
@@ -66,102 +45,50 @@ for u,v in G.edges:
 	else:
 		G[u][v]['weight']= 2
 
-group = [[i] for i in G]
 
 G1 = nx.Graph(G)
 
-lista = [0, 5, 5]
+#lista = [(0, 5), 5, 7]
 
-x = 0
-y = 1
-#for i in group:
-#	for j in group:
-#		for x in i:
-#			for y in j:
-#				print(nodes_connected(x, y))
-
-
-	#group[:] = [v for v in group if v.index != do_usuniecia]
+node_list1 = list(G.nodes)
+node_list2 = list(G.nodes)
 	
-	#group.remove(do_usuniecia)
-	#do_usuniecia += 1
+while len(node_list1) > 1:
+	grid = []
+	for node1 in node_list1:
+		v_distance_list = []
+		for node2 in node_list2:
+			v_weight = 0
+			v_entropy = 0
+			v_distance =  0
+			connected = False
+			color_list = []
+			if isinstance(node1, (tuple,)) is True: #sprawdzenie czy element listy node_list1 jest grupa typu tuple
+				for e in node1:
+					if nodes_connected(e, node2) is True: #sprawdzenie czy grupy sa polaczone
+						connected = True
+						v_weight = v_weight + G.degree(e) #suma wag polaczonych grup
+						color_list.append(G.nodes[e]['color']) #sumaryczna lista kolorow polaczonych wezlow w grupach
+				if connected is True: #jesli istnieje polaczenie w grupie, licz odleglosc, inaczej odleglosc = 0
+					v_weight = v_weight + G.degree(node2)
+					v_entropy = entropy(color_list + G.nodes[node2]['color'])
+					v_distance = 1/v_weight * v_entropy
+			else:
+				if nodes_connected(node1, node2) is True:
+					v_weight = G.degree(node1) + G.degree(node2)
+					v_entropy = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
+					v_distance = 1/v_weight * v_entropy
+			v_distance_list.append(v_distance)
+		grid.append(v_distance_list) #macierz odleglosci
+	#poszukiwania najblizszych grup
+	print(node_list1)
+	distances = [(1, 0, grid[1][0])]
+	for i,row in enumerate(grid[2:]):
+		distances += [(i+2, j, c) for j,c in enumerate(row[:i+2])]
+	j,i,_ = min(distances, key=lambda x:x[2])
+	c = Cluster()
+	node_list1, grid = c.add(node_list1, grid, i, j)
+	node_list1[i] = c
+	node_list1.pop()
+	node_list2.pop()
 	
-
-	
-	
-	
-	
-wynik = []
-
-	
-for node1 in G.nodes:
-	waga = 0
-	entropia = 0
-	odleglosc =  0
-	odleglosc_list = []
-	for node2 in G.nodes:
-		waga = 0
-		entropia = 0
-		odleglosc =  0
-		if nodes_connected(node1, node2) is True:
-			waga = G.degree(node1) + G.degree(node2)
-			entropia = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
-			odleglosc = 1/waga * entropia
-		odleglosc_list.append(odleglosc)
-	
-	wynik.append(odleglosc_list)
-	
-
-#print(wynik)
-#print(G.nodes)
-nody = list(G.nodes)
-		
-
-print(agglomerate(nody, wynik))
-
-#		summary_list.append(G1.degree(node))
-#while (len(group) >  1):
-#	for i in group:
-#		for u,v in G.edges:	
-#			if  G.nodes[u]['color'] !=  G.nodes[v]['color']:
-				
-
-
-#summary_list = remove_values_from_list(summary_list, 0)
-#print(min(summary_list))
-
-
-#print(list(G.neighbors(0)))
-
-#for node in G:	
-#	print(G.nodes[node]['color'])
-
-
-#print(G.nodes[30]['color'])
-#print(entropy(G.nodes[i]['color']))
-
-#for i in G.nodes:	
-#	color_list.append(G.nodes[i]['color'])
-
-#1/x * entropy(dict_colors
-
-
-#print(entropy(list(node_colors.values())))
-#print(len(group))
-#print(sum(G.degree(weight = 'weight')))
-#Z = linkage(X, 'single')
-#print(color_list)
-#print(entropy(color_list))
-#print(G.degree(weight = 'weight')[0])
-#print(len(G.degree))
-#print(len(color_list))
-
-#print(G.degree(weight = 'weight')[0])
-
-#X = [[i] for i in [2, 8, 0, 4, 1, 9, 9, 0]]
-#Z = linkage(X, 'single')
-#print(X)
-#print(Z)
-#print(type(Z))
-#dn = dendrogram(Z)
-#plt.show()

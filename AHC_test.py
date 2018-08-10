@@ -33,7 +33,7 @@ def remove_values_from_list(the_list, val):
    
 G=nx.Graph()
 
-G = nx.random_graphs.erdos_renyi_graph(32,0.3)
+G = nx.random_graphs.erdos_renyi_graph(14,0.3)
 
 node_colors = { i: np.random.choice(['white','black']) for i in G.nodes}
 
@@ -78,10 +78,10 @@ while len(node_list1) > 1:
 					v_weight = G.degree(node1) + G.degree(node2)
 					v_entropy = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
 					v_distance = 1/v_weight * v_entropy
-			v_distance_list.append(v_distance)
+			v_distance_list.append(round(v_distance, 2))
 		grid.append(v_distance_list) #macierz odleglosci
 	#poszukiwania najblizszych grup
-	print(node_list1)
+	
 	distances = [(1, 0, grid[1][0])]
 	for i,row in enumerate(grid[2:]):
 		distances += [(i+2, j, c) for j,c in enumerate(row[:i+2])]
@@ -89,6 +89,6 @@ while len(node_list1) > 1:
 	c = Cluster()
 	node_list1, grid = c.add(node_list1, grid, i, j)
 	node_list1[i] = c
-	node_list1.pop()
-	node_list2.pop()
+	node_list2.pop(i)
+	print(node_list1)
 	

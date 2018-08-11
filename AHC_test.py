@@ -52,7 +52,9 @@ G1 = nx.Graph(G)
 
 node_list1 = list(G.nodes)
 node_list2 = list(G.nodes)
-	
+
+x = len(node_list2)
+
 while len(node_list1) > 1:
 	grid = []
 	for node1 in node_list1:
@@ -78,10 +80,9 @@ while len(node_list1) > 1:
 					v_weight = G.degree(node1) + G.degree(node2)
 					v_entropy = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
 					v_distance = 1/v_weight * v_entropy
-			v_distance_list.append(round(v_distance, 2))
+			v_distance_list.append(v_distance)
 		grid.append(v_distance_list) #macierz odleglosci
 	#poszukiwania najblizszych grup
-	
 	distances = [(1, 0, grid[1][0])]
 	for i,row in enumerate(grid[2:]):
 		distances += [(i+2, j, c) for j,c in enumerate(row[:i+2])]
@@ -89,6 +90,6 @@ while len(node_list1) > 1:
 	c = Cluster()
 	node_list1, grid = c.add(node_list1, grid, i, j)
 	node_list1[i] = c
-	node_list2.pop(i)
+	node_list2.pop(j)
 	print(node_list1)
 	

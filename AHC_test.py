@@ -1,95 +1,86 @@
 import networkx as nx
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.cluster.hierarchy import dendrogram, linkage
+import doctest
 
-class Cluster:
-	def __init__(self):
-		pass
-	def __repr__(self):
-		return '(%s,%s)' % (self.left, self.right)
-	def add(self, clusters, grid, lefti, righti):
-		self.left = clusters[lefti]
-		self.right = clusters[righti]
-		for r in grid:
-			r[lefti] = min(r[lefti], r.pop(righti))
-		grid[lefti] = list(map(min, zip(grid[lefti], grid.pop(righti))))
-		clusters.pop(righti)
-		return (clusters, grid)
+import matplotlib.pyplot as plt
+
+from itertools import product, combinations
 
 def entropy(X):
-     _dict = { x: X.count(x)/len(X) for x in X }
+	'''
+	Computes the entropy of a collection of values
 
-     _entropy = -1 * np.sum([p * np.log2(p) for p in _dict.values()])
+	:param X: list of values
+	:return: Shannon's entropy of `X`
 
-     return _entropy
+	Tests:
+	>>> entropy([1,1,1,1])
+	-0.0
+	>>> entropy([0,0,1,1])
+	1.0
+	'''
 
-	 
-def nodes_connected(u, v):
-	return u in G.neighbors(v)
+	_dict = { x: X.count(x)/len(X) for x in X }
+	_entropy = -1 * np.sum([p * np.log2(p) for p in _dict.values()])
 
-def remove_values_from_list(the_list, val):
-   return [value for value in the_list if value != val]
-   
-G=nx.Graph()
+	return _entropy
 
-G = nx.random_graphs.erdos_renyi_graph(14,0.3)
+def distance(grp1, grp2, G):
+	'''
+	Computes the custom distance between groups of vertices in graph G
 
-node_colors = { i: np.random.choice(['white','black']) for i in G.nodes}
+	:param grp1: first group of vertices
+	:param grp2: second group of vertices
+	:param G: input graph
+	:return: distance between groups
+	'''
+
+	edges = [(u, v) for u, v in product(grp1, grp2) if (u, v) in G.edges]
+	edge_colors = [G.nodes[n]['color'] for n in grp1+grp2]
+	sum_edge_weights = sum([G[u][v]['weight'] for (u,v) in edges])
+
+	if not edges:
+		return np.inf
+	else:
+		return (1/sum_edge_weights) * entropy(edge_colors)
+
+doctest.testmod()
+
+# ---------- [start] graph initialization --------------------------
+
+G = nx.random_graphs.erdos_renyi_graph(10, 0.3)
+
+node_colors = {i: np.random.choice(['red', 'yellow']) for i in G.nodes}
 
 nx.set_node_attributes(G, node_colors, 'color')
 
-for u,v in G.edges:	
-	if  G.nodes[u]['color'] ==  G.nodes[v]['color']:
-		G[u][v]['weight']= 1
+for u, v in G.edges:
+	if G.nodes[u]['color'] == G.nodes[v]['color']:
+		G[u][v]['weight'] = 1
 	else:
-		G[u][v]['weight']= 2
+		G[u][v]['weight'] = 2
+
+# ---------- [end] graph initialization --------------------------
+
+tuples_to_lists = lambda lst: [list(elem) for elem in lst]
+flatten = lambda lst: [elem for sublst in lst for elem in sublst]
+
+groups = [[nodes] for nodes in G.nodes()]
+
+while len(groups) > 1:
+
+	pairs = tuples_to_lists(combinations(groups, 2))
+	distances = [distance(u, v, G) for u,v in pairs]
+
+	min_distance = min(distances)
+	min_pair_idx = distances.index(min_distance)
+
+	groups.remove(pairs[min_pair_idx][0])
+	groups.remove(pairs[min_pair_idx][1])
+	groups.append(flatten(pairs[min_pair_idx]))
+
+	print(groups, 'minimum distance: ', min_distance)
 
 
-G1 = nx.Graph(G)
-
-#lista = [(0, 5), 5, 7]
-
-node_list1 = list(G.nodes)
-node_list2 = list(G.nodes)
-
-x = len(node_list2)
-
-while len(node_list1) > 1:
-	grid = []
-	for node1 in node_list1:
-		v_distance_list = []
-		for node2 in node_list2:
-			v_weight = 0
-			v_entropy = 0
-			v_distance =  0
-			connected = False
-			color_list = []
-			if isinstance(node1, (tuple,)) is True: #sprawdzenie czy element listy node_list1 jest grupa typu tuple
-				for e in node1:
-					if nodes_connected(e, node2) is True: #sprawdzenie czy grupy sa polaczone
-						connected = True
-						v_weight = v_weight + G.degree(e) #suma wag polaczonych grup
-						color_list.append(G.nodes[e]['color']) #sumaryczna lista kolorow polaczonych wezlow w grupach
-				if connected is True: #jesli istnieje polaczenie w grupie, licz odleglosc, inaczej odleglosc = 0
-					v_weight = v_weight + G.degree(node2)
-					v_entropy = entropy(color_list + G.nodes[node2]['color'])
-					v_distance = 1/v_weight * v_entropy
-			else:
-				if nodes_connected(node1, node2) is True:
-					v_weight = G.degree(node1) + G.degree(node2)
-					v_entropy = entropy(G.nodes[node1]['color'] + G.nodes[node2]['color'])
-					v_distance = 1/v_weight * v_entropy
-			v_distance_list.append(v_distance)
-		grid.append(v_distance_list) #macierz odleglosci
-	#poszukiwania najblizszych grup
-	distances = [(1, 0, grid[1][0])]
-	for i,row in enumerate(grid[2:]):
-		distances += [(i+2, j, c) for j,c in enumerate(row[:i+2])]
-	j,i,_ = min(distances, key=lambda x:x[2])
-	c = Cluster()
-	node_list1, grid = c.add(node_list1, grid, i, j)
-	node_list1[i] = c
-	node_list2.pop(j)
-	print(node_list1)
-	
+nx.draw(G, with_labels=True, node_color=list(node_colors.values()))
+plt.show()

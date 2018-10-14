@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 import doctest
+from functools import reduce
 
 import matplotlib.pyplot as plt
 
@@ -44,6 +45,26 @@ def distance(grp1, grp2, G):
 	else:
 		return (1/sum_edge_weights) * entropy(edge_colors)
 
+def cycles_index(grp, G):
+	'''
+	Multiplies edges weight for each node in cycles in graph G
+
+	:param grp1: all cycles in graph
+	:param G: input graph
+	:return: index for each cycle
+	'''
+
+	i = 0
+	edges_weight = []
+	choosen_nodes = [list(zip(nodes,(nodes[1:]+nodes[:1]))) for nodes in grp] #wyszukanie każdej pary w cyklu tak aby poprawnie móc wybrać wagę krawędzi między tymi dwoma węzłami
+	while i < len(choosen_nodes):
+		edges_weight = edges_weight + [[G[u][v]['balance_weight'] for (u,v) in choosen_nodes[i]]] #dla każdej pary wierchołków wyszukanie łączącej ich krawędzi i pobranie dla niej wagi (z parametru balance_weight)
+		i = i + 1
+	cycles_index =  [reduce(lambda x, y: x*y, edge) for edge in edges_weight] #mnożenie wag krawędzi w każdym cyklu
+	
+	return cycles_index
+
+		
 doctest.testmod()
 
 # ---------- [start] graph initialization --------------------------
@@ -57,8 +78,12 @@ nx.set_node_attributes(G, node_colors, 'color')
 for u, v in G.edges:
 	if G.nodes[u]['color'] == G.nodes[v]['color']:
 		G[u][v]['weight'] = 1
+		G[u][v]['balance_weight'] = 1 #dodanie nowego parametru ze względu na to, iż w przypadku wartości ujemnej parametr sum_edge_weights wyliczany jest jako zero, a wyliczanie w ramach funkcji odległości wywraca się na dzieleniu przez zero
 	else:
 		G[u][v]['weight'] = 2
+		G[u][v]['balance_weight'] = -1
+		
+cycles = nx.cycle_basis(G)
 
 # ---------- [end] graph initialization --------------------------
 
@@ -81,6 +106,16 @@ while len(groups) > 1:
 
 	print(groups, 'minimum distance: ', min_distance)
 
+cycles_indicators = cycles_index(cycles, G)
+balance_index = sum(cycles_indicators)
+
+print('graph cycles: ', cycles)
+print('cycles indicators: ', cycles_indicators)
+print('graph balance index: ', balance_index)
 
 nx.draw(G, with_labels=True, node_color=list(node_colors.values()))
 plt.show()
+
+
+
+

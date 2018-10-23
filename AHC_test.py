@@ -10,10 +10,8 @@ from itertools import product, combinations
 def entropy(X):
 	'''
 	Computes the entropy of a collection of values
-
 	:param X: list of values
 	:return: Shannon's entropy of `X`
-
 	Tests:
 	>>> entropy([1,1,1,1])
 	-0.0
@@ -29,7 +27,6 @@ def entropy(X):
 def distance(grp1, grp2, G):
 	'''
 	Computes the custom distance between groups of vertices in graph G
-
 	:param grp1: first group of vertices
 	:param grp2: second group of vertices
 	:param G: input graph
@@ -48,7 +45,6 @@ def distance(grp1, grp2, G):
 def cycles_index(grp, G):
 	'''
 	Multiplies edges weight for each node in cycles in graph G
-
 	:param grp1: all cycles in graph
 	:param G: input graph
 	:return: index for each cycle
@@ -115,7 +111,5 @@ print('graph balance index: ', balance_index)
 
 nx.draw(G, with_labels=True, node_color=list(node_colors.values()))
 plt.show()
-
-
 
 

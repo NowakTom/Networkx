@@ -6,6 +6,7 @@ from functools import reduce
 import matplotlib.pyplot as plt
 from itertools import product, combinations
 import sys
+from scipy.stats import spearmanr
 	
 def graph_init(n, p, percent, balance_weight_grp1, balance_weight_grp2):
 	'''
@@ -19,19 +20,29 @@ def graph_init(n, p, percent, balance_weight_grp1, balance_weight_grp2):
 	
 	#Test graph
 	#------------------------------------------------
-	#graph=nx.Graph()
-	#graph.add_nodes_from([1,2,3,4])
-	#graph.add_edges_from([(1,2),(1,3), (1,4), (2,3)])
+	graph=nx.Graph()
+	graph.add_nodes_from([0,1,2,3,4])
+	graph.add_edges_from([(0,1),(0,2), (0,3), (1,2), (1,4)])
 	
-	graph = nx.random_graphs.erdos_renyi_graph(n, p)
+	#graph = nx.random_graphs.erdos_renyi_graph(n, p)
 	
-	positive_edges = math.floor(len(graph.edges) * percent)
+	#positive_edges = math.floor(len(graph.edges) * percent)
 	
-	for i, unique_combination in enumerate(graph.edges):
-		if i < positive_edges:
-			graph[list(unique_combination)[0]][list(unique_combination)[1]]['balance_weight'] = balance_weight_grp1
-		else:
-			graph[list(unique_combination)[0]][list(unique_combination)[1]]['balance_weight'] = balance_weight_grp2
+	#Test color
+	#------------------------------------------------
+	#negative
+	graph[0][1]['balance_weight'] = balance_weight_grp2
+	graph[0][3]['balance_weight'] = balance_weight_grp2
+	#positive
+	graph[0][2]['balance_weight'] = balance_weight_grp1
+	graph[1][2]['balance_weight'] = balance_weight_grp1
+	graph[1][4]['balance_weight'] = balance_weight_grp1
+	
+	#for i, unique_combination in enumerate(graph.edges):
+	#	if i < positive_edges:
+	#		graph[list(unique_combination)[0]][list(unique_combination)[1]]['balance_weight'] = balance_weight_grp1
+	#	else:
+	#		graph[list(unique_combination)[0]][list(unique_combination)[1]]['balance_weight'] = balance_weight_grp2
 
 	cycles = nx.cycle_basis(graph)
 	
@@ -160,9 +171,9 @@ def dict_color_nodes(nodes, color_grp1, color_grp2):
 	colors = {}
 	for u, node in enumerate(nodes):
 		if node == 0:
-			colors.update({u : color_grp1})
+			colors.update({u: color_grp1})
 		else:
-			colors.update({u : color_grp2})
+			colors.update({u: color_grp2})
 
 	return colors
 		
@@ -187,7 +198,7 @@ gini_list = []
 frustation_list = []
 balance_list = []
 
-for number in range(100):
+for number in range(1):
 	list_of_colors = ['None']
 	
 	G, cycles = graph_init(n, p, perc_positive_edges, same_node_color_edge_balance_weight, opposite_node_color_edge_balance_weight)
@@ -221,7 +232,7 @@ for number in range(100):
 	#---------- [start] reprint nodes with param: list_of_colors --------------------------
 	
 	groups = [[nodes] for nodes in G.nodes()]
-	
+	print('AHC:')
 	while len(groups) > 1:
 	
 		pairs = tuples_to_lists(combinations(groups, 2))
@@ -235,27 +246,36 @@ for number in range(100):
 		groups.remove(pairs[min_pair_idx][1])
 		groups.append(flatten(pairs[min_pair_idx]))
 	
-		#print(groups, 'minimum distance: ', min_distance)
+		print(groups, 'minimum distance: ', min_distance)
 	
 	cycles_indicators = indicators(cycles, G)
 	balance_index = sum(cycles_indicators)
-		
-	#print('list of minimum distances: ', min_distances)
-	#print('graph cycles: ', cycles)
-	#print('cycles indicators: ', cycles_indicators)
-	#print('graph balance index: ', balance_index)
-	#print('Gini coefficient: ', gini(min_distances))
-	#print('lowest frustration index: ', lowest_frustration)
 	
-	#nx.draw(G, with_labels=True, node_color=list(node_colors.values()))
-	#plt.show()
+	
+	print('list of minimum distances: ', min_distances)
+	print('Gini coefficient: ', gini(min_distances))
+	print('\n#########################################\n')
+	print('Balance index:')
+	print('graph cycles: ', cycles)
+	print('cycles indicators: ', cycles_indicators)
+	print('graph balance index: ', balance_index)
+	print('\n#########################################\n')
+	print('Frustration index:')
+	print('unique combinations for frustration: ', unique_combinations)
+	print('indices of frustration: ', indices_of_frustration)
+	print('lowest_frustration_index_with_colors (0 means first color, 1 means second):', lowest_frustration_index_with_colors)
+	print('lowest frustration index: ', lowest_frustration)
+	print('\n#########################################\n')
 	
 	gini_list.append(gini(min_distances))
 	frustation_list.append(lowest_frustration)
 	balance_list.append(balance_index)
 
-print('Pearson correlation coefficients between gini and frustration index: ')
-print(np.corrcoef(gini_list, frustation_list))
-print('\n')
-print('Pearson correlation coefficients between gini and balance index index: ')
-print(np.corrcoef(gini_list, balance_list))
+#print('Spearman correlation coefficients between gini and frustration index: ')
+#print(spearmanr(gini_list, frustation_list))
+#print('\n')
+#print('Spearman correlation coefficients between gini and balance index: ')
+#print(spearmanr(gini_list, balance_list))
+
+nx.draw(G, with_labels=True, node_color=list(node_colors.values()))
+plt.show()

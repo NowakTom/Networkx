@@ -38,7 +38,7 @@ def graph_init(n, p, percent, balance_weight_grp1, balance_weight_grp2):
 	
 	return H, cycles
 
-def color_graph_nodes(G, color_grp1, color_grp2, weight_grp1, weight_grp2, list_of_colors):
+def color_weight_graph_nodes(G, color_grp1, color_grp2, weight_grp1, weight_grp2, list_of_colors):
 	'''
 	Coloring graph nodes
 	:param G: input graph
@@ -195,7 +195,7 @@ for number in range(100):
 	list_of_colors = ['None']
 	
 	G, cycles = graph_init(n, p, perc_positive_edges, same_node_color_edge_balance_weight, opposite_node_color_edge_balance_weight)
-	node_colors = color_graph_nodes(G, first_grp_color, second_grp_color, same_node_color_edge_weight, opposite_node_color_edge_weight, list_of_colors)
+	node_colors = color_weight_graph_nodes(G, first_grp_color, second_grp_color, same_node_color_edge_weight, opposite_node_color_edge_weight, list_of_colors)
 	
 	# ---------- [end] graph initialization --------------------------
 	
@@ -223,7 +223,7 @@ for number in range(100):
 	
 	#---------- [start] reprint nodes with param: list_of_colors --------------------------
 	
-	node_colors = color_graph_nodes(G, first_grp_color, second_grp_color, same_node_color_edge_weight, opposite_node_color_edge_weight, list_of_colors)
+	node_colors = color_weight_graph_nodes(G, first_grp_color, second_grp_color, same_node_color_edge_weight, opposite_node_color_edge_weight, list_of_colors)
 	
 	#---------- [start] reprint nodes with param: list_of_colors --------------------------
 	
